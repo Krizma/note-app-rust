@@ -1,0 +1,7 @@
+[package]
+name = "note-app-rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rusqlite = "0.31" # Use the latest version
