@@ -3,13 +3,9 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        echo "Getting Rust"
-        sh """
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-        source $HOME/.cargo/env
-        export PATH=$HOME/.cargo/bind:$PATH
-        rustc --version
-        """
+        echo "Setting up cargo"
+        sh "source $HOME/.cargo/env"
+        sh "export PATH=$HOME/.cargo/bind:$PATH"
         echo "Building..."
         sh 'cargo build'
       }
