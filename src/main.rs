@@ -17,15 +17,17 @@ create_config() --Not in C version
 read_config() --Not in C version
 */
 
-use core::{panic};
-use std::{env::{self, consts::OS}, fs::create_dir, io::{self, Error, ErrorKind}, path::PathBuf};
+use core::{error, panic};
+use std::{env::{self, consts::OS}, fs::create_dir, io::{ ErrorKind}, path::PathBuf};
 use dirs::{home_dir};
+use rusqlite::{Connection, ErrorCode};
 
 
 struct Note {
+    id:u32,
     title: String,
     body: String,
-    time: String,
+    time: i64,
 }
 
 fn main() {
@@ -58,28 +60,27 @@ fn main() {
     };
     
     println!("DEBUG: Home: {}",my_dir.to_string_lossy());
-    check_if_folder_exists_or_create_folder(my_dir);
+    check_if_folder_and_db_exists_or_create(my_dir);
 }
 
-fn check_if_folder_exists_or_create_folder(my_dir:PathBuf){
+fn check_if_folder_and_db_exists_or_create(my_dir:PathBuf){
     let my_dir_concat = format!("{}/note",my_dir.to_string_lossy());
-    match create_dir(my_dir_concat) {
+    match create_dir(&my_dir_concat) {
         Ok(_file)=>println!("Dir concact outcome: {}/note",my_dir.to_string_lossy()),
         Err(error)=>match error.kind() {
-            ErrorKind::NotADirectory =>println!("Permissiond Denied or path already exists, or parent path doesnt exists"),
-            _ => println!("Error creating directory: {:?}", error),
+            ErrorKind::AlreadyExists =>println!("DEBUG:Folder already exists. It is ok to continue"),
+            _ => println!("Error creating directory. Access denied, or a parent folder in the path doesnt exist.: {:?}", error),
         },
     }
-    
-    // Ok(println!("DEBUG: ));
-    // Err(());
-    // println!("DEBUG: Dir concact outcome: {}/note",my_dir.to_string_lossy());
-    
-}
-
-
-fn check_if_note_db_exists() {
-
+    let db_file:String = format!("{}/notes.db",&my_dir_concat);
+    let db: Result<Connection, rusqlite::Error> = Connection::open(&db_file);
+    match db {
+        Ok(_) => println!("DEBUG: Database successfully opened"),
+        Err(rusqlite) => match rusqlite.sqlite_error_code() {
+            Some(ErrorCode::CannotOpen) => println!("DB Couldnt open"),
+            _ => panic!("Could not open db for an unknown reason"),
+        },
+    }
 }
 
 fn create_db_table_if_not_exists() {
