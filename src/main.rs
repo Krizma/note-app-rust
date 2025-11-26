@@ -17,7 +17,7 @@ create_config() --Not in C version
 read_config() --Not in C version
 */
 
-use core::{error, panic};
+use core::{panic};
 use std::{env::{self, consts::OS}, fs::create_dir, io::{ ErrorKind}, path::PathBuf};
 use dirs::{home_dir};
 use rusqlite::{Connection, ErrorCode};
@@ -25,9 +25,9 @@ use rusqlite::{Connection, ErrorCode};
 
 struct Note {
     id:u32,
-    title: String,
-    body: String,
     time: i64,
+    title: String,
+    note: String,
 }
 
 fn main() {
@@ -60,10 +60,11 @@ fn main() {
     };
     
     println!("DEBUG: Home: {}",my_dir.to_string_lossy());
-    check_if_folder_and_db_exists_or_create(my_dir);
+    let db_path = check_if_folder_and_db_exists_or_create(my_dir);
+    create_db_table_if_not_exists(db_path);
 }
 
-fn check_if_folder_and_db_exists_or_create(my_dir:PathBuf){
+fn check_if_folder_and_db_exists_or_create(my_dir:PathBuf) -> String{
     let my_dir_concat = format!("{}/note",my_dir.to_string_lossy());
     match create_dir(&my_dir_concat) {
         Ok(_file)=>println!("Dir concact outcome: {}/note",my_dir.to_string_lossy()),
@@ -81,10 +82,14 @@ fn check_if_folder_and_db_exists_or_create(my_dir:PathBuf){
             _ => panic!("Could not open db for an unknown reason"),
         },
     }
+    return my_dir_concat;
 }
 
-fn create_db_table_if_not_exists() {
-
+fn create_db_table_if_not_exists(db_path:String) {
+    let db_connect = Connection::open_in_memory()?;
+    let sql:String = String("CREATE TABLE IF NOT EXISTS notes(ID INT PRIMARY KEY NOT NULL, TIME INT NOT NULL, TITLE TEXT, NOTE TEXT)"),
+    ();//empty params;
+    db_connect.execute(sql, params)?;
 }
 fn check_if_note_already_exists() {
 
