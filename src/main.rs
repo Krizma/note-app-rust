@@ -18,7 +18,7 @@ read_config() --Not in C version
 */
 
 use core::{panic};
-use std::{env, fs::create_dir, path::PathBuf};
+use std::{env::{self, consts::OS}, fs::create_dir, io::{self, Error, ErrorKind}, path::PathBuf};
 use dirs::{home_dir};
 
 
@@ -61,10 +61,20 @@ fn main() {
     check_if_folder_exists_or_create_folder(my_dir);
 }
 
-fn check_if_folder_exists_or_create_folder(my_dir:PathBuf) -> std::io::Result<()> {
-    create_dir(my_dir.to_string_lossy()+"/note")?;
-    println!("DEBUG: Dir concact outcome: {}/note",my_dir.to_string_lossy());
-    Ok(());
+fn check_if_folder_exists_or_create_folder(my_dir:PathBuf){
+    let my_dir_concat = format!("{}/note",my_dir.to_string_lossy());
+    match create_dir(my_dir_concat) {
+        Ok(_file)=>println!("Dir concact outcome: {}/note",my_dir.to_string_lossy()),
+        Err(error)=>match error.kind() {
+            ErrorKind::NotADirectory =>println!("Permissiond Denied or path already exists, or parent path doesnt exists"),
+            _ => println!("Error creating directory: {:?}", error),
+        },
+    }
+    
+    // Ok(println!("DEBUG: ));
+    // Err(());
+    // println!("DEBUG: Dir concact outcome: {}/note",my_dir.to_string_lossy());
+    
 }
 
 
