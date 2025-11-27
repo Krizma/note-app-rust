@@ -7,3 +7,6 @@ edition = "2024"
 rusqlite = { version = "0.37.0" , features = ["bundled"] }
 dirs = "6.0.0" # Use the latest version
 fs = "0.0.5"
+
+[dev-dependencies]
+criterion = "0.7.0"
