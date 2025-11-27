@@ -20,7 +20,7 @@ read_config() --Not in C version
 use core::{panic};
 use std::{env::{self, consts::OS}, fs::create_dir, io::{ ErrorKind}, path::PathBuf};
 use dirs::{home_dir};
-use rusqlite::{Connection, ErrorCode};
+use rusqlite::{Connection, Error, ErrorCode};
 
 
 struct Note {
@@ -85,11 +85,11 @@ fn check_if_folder_and_db_exists_or_create(my_dir:PathBuf) -> String{
     return my_dir_concat;
 }
 
-fn create_db_table_if_not_exists(db_path:String) {
-    let db_connect = Connection::open_in_memory()?;
-    let sql:String = String("CREATE TABLE IF NOT EXISTS notes(ID INT PRIMARY KEY NOT NULL, TIME INT NOT NULL, TITLE TEXT, NOTE TEXT)"),
-    ();//empty params;
-    db_connect.execute(sql, params)?;
+fn create_db_table_if_not_exists(db_path:String) -> Result<(),Error> {
+    let db_connect = Connection::open(db_path)?;
+    let sql:&str = "CREATE TABLE IF NOT EXISTS notes(ID INT PRIMARY KEY NOT NULL, TIME INT NOT NULL, TITLE TEXT, NOTE TEXT)";
+    db_connect.execute(sql, ())?;
+        Ok(())
 }
 fn check_if_note_already_exists() {
 
