@@ -21,7 +21,7 @@ use core::panic;
 use dirs::home_dir;
 use rusqlite::{Connection, Result};
 use std::{
-    env::{self}, fs::create_dir, io::ErrorKind, path::PathBuf
+    env::{self}, fs::create_dir, io::ErrorKind, path::PathBuf, string
 };
 
 struct Note {
@@ -48,10 +48,10 @@ fn main() {
         panic!("DEBUG:Unexpected NULL Argument\n");
     }
 
-    let command = args[2].to_string();
+    let note_command = args[2].to_string();
     let note_number: u32 = args[1].parse().unwrap();
 
-    println!("DEBUG: Launch Parameters: {},{}", note_number, command);
+    println!("DEBUG: Launch Parameters: {},{}", note_number, note_command);
 
     if note_number >= max_length {
         panic!("DEBUG: Your input exceeds the size of the database.\n")
@@ -67,7 +67,8 @@ fn main() {
     println!("DEBUG: Home: {}", my_dir.to_string_lossy());
     let db_path: String = check_if_folder_and_db_exists_or_create(my_dir);
     create_db_table_if_not_exists(db_path.clone());
-    check_if_note_already_exists(db_path,note_number);
+    check_if_note_already_exists(db_path.clone(),note_number.clone());
+    get_user_command(db_path.clone(),note_command.clone());
 }
 
 fn check_if_folder_and_db_exists_or_create(my_dir: PathBuf) -> String {
@@ -102,18 +103,11 @@ fn check_if_folder_and_db_exists_or_create(my_dir: PathBuf) -> String {
         },
         Err(rusqlite) => format!("{}",rusqlite),
     }
-    // println!("{}", db_file.to_string_lossy().into_owned());
 }
-// fn open_db(db_path: String) -> Connection{
-//     let db_connect = Connection::open(db_path);
-//     return db_connectction;
-// }
 fn create_db_table_if_not_exists(db_path: String) -> Result<()> {
     let sql: &str = "CREATE TABLE IF NOT EXISTS notes(ID INT PRIMARY KEY NOT NULL, TIME INT NOT NULL, TITLE TEXT, NOTE TEXT)";
     let db_connect = Connection::open(db_path)?;
-    //println!("\nDEBUG:{}", db_connect.is_autocommit());
     let table_exists = db_connect.table_exists(None, "notes");
-    // println!("\nDEBUG: If Table Exists = {}",table_exists.unwrap().to_string());
       match table_exists.as_ref() {
         Ok(true)=>{
             println!("\nDEBUG: table_exists");
@@ -123,31 +117,15 @@ fn create_db_table_if_not_exists(db_path: String) -> Result<()> {
             println!("\nDEBUG: cant create: {}",e);
           }
         }
-        // _=>{}
         Err(e)=>
         {
             println!("\nDEBUG: HEHE HAHA ERROR {}",e);
         }
       }
-        //     true => println!("Table Exists"),
-            // false =>  db_connect.execute(sql, ()),
-        //     _ => println!("some error hehe")
-        // }
-    
-
-    //db_connect.execute(sql, ())?;
-    //println!("{:?}\n{:?}\n{:?}\nDB Connect executed",MAIN_DB,TEMP_DB,SQLITE_ATTACH);
     Ok(())
 }
 fn check_if_note_already_exists(db_path:String,note_number:u32) -> Result<()>{
-    // let db_connect = Connection::open(db_path)?;
-    // let sql: &str = format!("SELECT EXISTS(SELECT 1 FROM notes WHERE ID = {}",note_number);
-    // db_connect.execute(&sql,())?;
-    // print!("DB connect Executed. Location: Check if note already exists");
-    // Ok(Result);
-    // Err(_)
     let db_connect = Connection::open(db_path)?;
-
     let sql:String = format!("SELECT EXISTS(SELECT 1 FROM notes WHERE ID = {}",note_number);
     let sql: &str = &sql;
     db_connect.execute(&sql, ())?;
@@ -156,19 +134,43 @@ fn check_if_note_already_exists(db_path:String,note_number:u32) -> Result<()>{
 
 }
 
-fn get_case_switch_command_number() {}
+fn get_user_command(db_path:String,note_command:String) {
+    let create_strings: [String; 2] = ["create","new"];
+    match note_command {
+         "create" | "new" => create_note(),
+        "read"  => read_note(),
+        "delete" | "remove" => delete_note(),
+        "update" | "edit" | "modify" => modify_note(),
+    }
+}
 
-fn create_note() {}
+fn create_note() {
+    unimplemented!("Create note")
+}
 
-fn read_note() {}
-fn delete_note() {}
+fn read_note() {
+    unimplemented!("read note")
+}
+fn delete_note() {
+    unimplemented!("delete note")
+}
 
-fn modify_note() {}
+fn modify_note() {
+    unimplemented!("modify note")
+}
 
-fn modify_config() {}
+fn modify_config() {
+    unimplemented!("modify config")
+}
 
-fn restore_default_config() {}
+fn restore_default_config() {
+    unimplemented!("restor default config")
+}
 
-fn read_config() {}
+fn read_config() {
+    unimplemented!("read config")
+}
 
-fn show_written_notes_num_and_title() {}
+fn show_written_notes_num_and_title() {
+    unimplemented!("show written notes")
+}
