@@ -11,28 +11,12 @@
             "cargo": {
                 "args": [
                     "run",
-                    "--bin=note-app-rust",
-                    
+                    "--bin=note-app-rust"
                 ]
             },
             "args": ["1","add"]
-        },
-        
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "cargo test -p note-app-rust --all-targets",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}\\target\\debug\\deps\\note_app_rust-0501a983d2bf13ea.exe",
-            "env": {
-                "RUST_BACKTRACE": "short",
-                "RUSTC_TOOLCHAIN": "C:\\Users\\Reid\\.rustup\\toolchains\\stable-x86_64-pc-windows-msvc"
-            },
-            "args": ["1 add"],
-            "sourceMap": {},
-            "sourceLanguages": [
-                "rust"
-            ]
         }
+        
+
     ]
 }

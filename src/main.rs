@@ -19,7 +19,7 @@ read_config() --Not in C version
 
 use core::panic;
 use dirs::home_dir;
-use rusqlite::{Connection, MAIN_DB, Result, TEMP_DB, ffi::SQLITE_ATTACH};
+use rusqlite::{Connection, Result};
 use std::{
     env::{self}, fs::create_dir, io::ErrorKind, path::PathBuf
 };
@@ -42,10 +42,10 @@ fn main() {
     //}
     match args.len() {
         3 => (),
-        _ => panic!("You did not specify the appropriate amount of args\n"),
+        _ => panic!("DEBUG:You did not specify the appropriate amount of args\n"),
     }
     if args[1].len() <= 0 || args[2].len() <= 0 {
-        panic!("Unexpected NULL Argument\n");
+        panic!("DEBUG:Unexpected NULL Argument\n");
     }
 
     let command = args[2].to_string();
@@ -54,13 +54,13 @@ fn main() {
     println!("DEBUG: Launch Parameters: {},{}", note_number, command);
 
     if note_number >= max_length {
-        panic!("Your input exceeds the size of the database.\n")
+        panic!("DEBUG: Your input exceeds the size of the database.\n")
     }
 
     let my_dir: PathBuf = match home_dir() {
         Some(my_dir) => my_dir,
         None => panic!(
-            "Could not find users home directory. You will have to set up a config and point to where you would like to store data for the program\n"
+            "DEBUG: Could not find users home directory. You will have to set up a config and point to where you would like to store data for the program\n"
         ),
     };
 
@@ -79,10 +79,10 @@ fn check_if_folder_and_db_exists_or_create(my_dir: PathBuf) -> String {
         Ok(_file) => println!("Dir concact outcome: {:?}", my_dir.to_str()),
         Err(error) => match error.kind() {
             ErrorKind::AlreadyExists => {
-                println!("DEBUG:Folder already exists. It is ok to continue")
+                println!("DEBUG: Folder already exists. It is ok to continue")
             }
             _ => println!(
-                "Error creating directory. Access denied, or a parent folder in the path doesnt exist.: {:?}",
+                "\nDEBUG: Error creating directory. Access denied, or a parent folder in the path doesnt exist.: {:?}",
                 error
             ),
         },
@@ -98,19 +98,9 @@ fn check_if_folder_and_db_exists_or_create(my_dir: PathBuf) -> String {
     match db {
         Ok(_) => {
             db_file.to_string_lossy().into_owned()
-                // db_file.canonicalize().unwrap().to_string_lossy().into_owned()
-            // match db_file.parent() {
-            //     Some(parent_path) => parent_path.to_string_lossy().into_owned(),
-            //     None => String::from(""),
-            // }
+
         },
         Err(rusqlite) => format!("{}",rusqlite),
-        // {
-        //     match rusqlite.sqlite_error_code() {
-        //         Some(ErrorCode::CannotOpen) => println!("DB Couldnt open"),
-        //         _ => panic!("Could not open db for an unknown reason"),
-        //     }
-        // }, 
     }
     // println!("{}", db_file.to_string_lossy().into_owned());
 }
@@ -126,17 +116,17 @@ fn create_db_table_if_not_exists(db_path: String) -> Result<()> {
     // println!("\nDEBUG: If Table Exists = {}",table_exists.unwrap().to_string());
       match table_exists.as_ref() {
         Ok(true)=>{
-            println!("\ntable_exists");
+            println!("\nDEBUG: table_exists");
         }
         Ok(false)=>{
           if let Err(e) = db_connect.execute(sql, ()){
-            println!("\ncant create: {}",e);
+            println!("\nDEBUG: cant create: {}",e);
           }
         }
         // _=>{}
         Err(e)=>
         {
-            println!("\nHEHE HAHA ERROR {}",e);
+            println!("\nDEBUG: HEHE HAHA ERROR {}",e);
         }
       }
         //     true => println!("Table Exists"),
